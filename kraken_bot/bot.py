@@ -363,9 +363,12 @@ class Bot:
                  strategy=o["key"], qty=qty, cost=round(cost + fee, 4))
         self.place_tp(pos)
 
-    def place_tp(self, pos):
+    def place_tp(self, pos, tk=None):
         pair = pos["pair"]
-        px = self.round_px(pair, pos["tp"], up=True)
+        ask = (tk or self.tickers())[pair]["ask"]
+        # price already above target: post-only at the target would be rejected
+        # forever, so rest at the ask instead (still maker, even better price)
+        px = self.round_px(pair, max(pos["tp"], ask), up=True)
         try:
             res = self.ex.add_order(pair, "sell", "limit", pos["qty"], ref_price=px, price=px, post_only=True)
             pos["tp_txid"] = res["txid"][0]
@@ -392,7 +395,7 @@ class Bot:
                 self.market_exit(p, "time", f"Zeitstopp erreicht, Setup hat sich nicht entwickelt "
                                  f"(Bid {bid:.6g}, Einstieg {p['entry']:.6g})", tk)
             elif not p["tp_txid"]:
-                self.place_tp(p)
+                self.place_tp(p, tk)
         self.state["positions"] = [p for p in self.state["positions"] if not p.get("closed")]
 
     def market_exit(self, p, kind, why, tk=None):

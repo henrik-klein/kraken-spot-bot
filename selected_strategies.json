@@ -1,0 +1,16 @@
+{
+  "generated": "2026-10-19T00:18:06.178186+00:00",
+  "fees": {
+    "maker": 0.0025,
+    "taker": 0.004
+  },
+  "split": {
+    "in_sample": [
+      "2026-01-01",
+      "2026-07-01"
+    ],
+    "out_of_sample_from": "2026-07-01"
+  },
+  "strategies": [],
+  "portfolio": {}
+}
